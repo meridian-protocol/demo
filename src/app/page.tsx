@@ -38,18 +38,38 @@ export default function Home() {
       )}
       
       {/* Top right social links */}
-      <div className={`absolute top-4 sm:top-6 right-4 sm:right-6 flex gap-3 sm:gap-4 ${showContent ? 'content-visible' : 'content-hidden'}`}>
-        <a href="https://github.com/meridian-protocol/demo" target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white transition-colors">
-          <Github className="w-5 h-5 sm:w-6 sm:h-6" />
+      <div className={`absolute top-4 sm:top-6 right-4 sm:right-6 flex gap-3 sm:gap-4 z-50 ${showContent ? 'content-visible' : 'content-hidden'}`}>
+        <a 
+          href="https://github.com/meridian-protocol/demo" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="text-white/70 hover:text-white transition-colors cursor-pointer block p-1"
+        >
+          <Github className="w-5 h-5 sm:w-6 sm:h-6 pointer-events-none" />
         </a>
-        <a href="https://docs.mrdn.finance/" target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white transition-colors">
-          <Book className="w-5 h-5 sm:w-6 sm:h-6" />
+        <a 
+          href="https://docs.mrdn.finance/" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="text-white/70 hover:text-white transition-colors cursor-pointer block p-1"
+        >
+          <Book className="w-5 h-5 sm:w-6 sm:h-6 pointer-events-none" />
         </a>
-        <a href="https://x.com/mrdn_finance" target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white transition-colors">
-          <Twitter className="w-5 h-5 sm:w-6 sm:h-6" />
+        <a 
+          href="https://x.com/mrdn_finance" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="text-white/70 hover:text-white transition-colors cursor-pointer block p-1"
+        >
+          <Twitter className="w-5 h-5 sm:w-6 sm:h-6 pointer-events-none" />
         </a>
-        <a href="https://t.me/mrdnfinance" target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white transition-colors">
-          <Telegram className="w-5 h-5 sm:w-6 sm:h-6" />
+        <a 
+          href="https://t.me/mrdnfinance" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="text-white/70 hover:text-white transition-colors cursor-pointer block p-1"
+        >
+          <Telegram className="w-5 h-5 sm:w-6 sm:h-6 pointer-events-none" />
         </a>
       </div>
       

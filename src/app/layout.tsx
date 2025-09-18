@@ -24,9 +24,9 @@ export const metadata: Metadata = {
   description: "Meridian x402 payment protocol demo",
   icons: {
     icon: [
-      { url: "/favicon.ico", type: "image/x-icon" },
       { url: "/favicon.svg", type: "image/svg+xml" },
     ],
+    shortcut: "/favicon.svg",
   },
 };
 
@@ -37,6 +37,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="shortcut icon" href="/favicon.svg" />
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable} ${funnelDisplay.variable}`}>
         <WalletProvider>{children}</WalletProvider>
       </body>
