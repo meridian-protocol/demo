@@ -1,3 +1,5 @@
+![Meridian Demo Screenshot](./product-photo.png)
+
 # Meridian Demo Application
 
 This is a Next.js demo application showcasing Meridian payment integration with X402 protocol.
