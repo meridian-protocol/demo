@@ -5,6 +5,9 @@ import { useState } from "react";
 import axios from "axios";
 import { createPaymentHeader, selectPaymentRequirements } from "x402/client";
 import { ChainIdToNetwork, PaymentRequirementsSchema } from "x402/types";
+import Image from "next/image";
+import Link from "next/link";
+import { Github, Book, Twitter, Telegram } from "iconoir-react";
 
 // Define the PaymentRequirements interface locally since it's not exported from x402/types
 interface PaymentRequirements {
@@ -198,49 +201,73 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
-      <main className="flex flex-col items-center justify-center">
-        <h1 className="text-2xl font-bold mb-8">
-          x402 Demo with Browser Wallet
-        </h1>
+    <div className="min-h-screen bg-[#0C0C0D] text-white flex flex-col p-4 sm:p-6 relative">
+      {/* Back to Home link - top left */}
+      <div className="absolute top-4 sm:top-6 left-4 sm:left-6">
+        <Link href="/" className="text-white/70 hover:text-white transition-colors font-mono text-sm">
+          ← Back to Home
+        </Link>
+      </div>
+      
+      {/* Top right social links */}
+      <div className="absolute top-4 sm:top-6 right-4 sm:right-6 flex gap-3 sm:gap-4">
+        <a href="https://github.com/meridian-protocol/demo" target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white transition-colors">
+          <Github className="w-5 h-5 sm:w-6 sm:h-6" />
+        </a>
+        <a href="https://docs.mrdn.finance/" target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white transition-colors">
+          <Book className="w-5 h-5 sm:w-6 sm:h-6" />
+        </a>
+        <a href="https://x.com/mrdn_finance" target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white transition-colors">
+          <Twitter className="w-5 h-5 sm:w-6 sm:h-6" />
+        </a>
+        <a href="https://t.me/mrdnfinance" target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white transition-colors">
+          <Telegram className="w-5 h-5 sm:w-6 sm:h-6" />
+        </a>
+      </div>
+      
+      {/* Main content area */}
+      <div className="flex-1 flex items-center justify-center">
+        <div className="text-center flex flex-col items-center w-full max-w-4xl">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-light mb-6 sm:mb-8 lg:mb-12 text-white px-4">
+            <span className="font-funnel-display font-light">Meridian</span> x402 Demo
+          </h1>
+          
+          <div className="bg-[#1F1F1F] rounded-xl shadow-lg p-6 sm:p-8 w-full max-w-2xl">
+          <main className="flex flex-col items-center justify-center">
 
         {!isConnected ? (
-          <div className="flex flex-col gap-4 mb-8">
-            <p>Connect your browser wallet to get started.</p>
+          <div className="flex flex-col gap-4 mb-8 text-center">
+            <p className="text-white/80 mb-4">Connect your browser wallet to get started.</p>
             <button
               onClick={connectWallet}
               type="button"
-              className="rounded-md bg-green-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-xs hover:bg-green-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600"
+              className="px-6 sm:px-8 py-3 sm:py-4 text-[#34D399] bg-emerald-500/10 hover:bg-emerald-500/5 rounded-lg font-mono transition-colors text-sm sm:text-lg"
             >
               Connect Wallet
             </button>
           </div>
         ) : (
-          <div className="flex flex-col gap-4 mb-8">
-            <p className="text-green-600">
+          <div className="flex flex-col gap-6 mb-8 text-center">
+            <p className="text-[#34D399] text-lg font-mono">
               Connected: {account?.slice(0, 6)}...{account?.slice(-4)}
             </p>
-            <ol className="list-decimal">
-              <li>
-                <div className="flex flex-col gap-4 mb-8">
-                  <p>Request a sample from the API.</p>
-                  <button
-                    onClick={requestSample}
-                    type="button"
-                    disabled={isLoading}
-                    className="rounded-md bg-indigo-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isLoading ? "Loading..." : "Request a sample"}
-                  </button>
-                </div>
-              </li>
-            </ol>
+            <div className="flex flex-col gap-4">
+              <p className="text-white/80 mb-4">Request a sample from the API to test x402 payments.</p>
+              <button
+                onClick={requestSample}
+                type="button"
+                disabled={isLoading}
+                className="px-6 sm:px-8 py-3 sm:py-4 text-[#34D399] bg-emerald-500/10 hover:bg-emerald-500/5 rounded-lg font-mono transition-colors text-sm sm:text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? "Loading..." : "Request Sample"}
+              </button>
+            </div>
 
             {/* Display Sample Response */}
             {sampleResponse && (
-              <div className="mt-8 p-4 bg-gray-100 rounded-lg max-w-2xl">
-                <h3 className="text-lg font-semibold mb-2">Sample Response:</h3>
-                <pre className="bg-white p-3 rounded border overflow-x-auto text-sm">
+              <div className="mt-8 p-4 bg-[#0C0C0D] rounded-lg w-full">
+                <h3 className="text-lg font-semibold mb-4 text-[#34D399] font-mono">Sample Response:</h3>
+                <pre className="bg-black/50 p-4 rounded-lg border border-white/10 overflow-x-auto text-sm text-white/90 font-mono">
                   {JSON.stringify(sampleResponse, null, 2)}
                 </pre>
               </div>
@@ -248,6 +275,28 @@ export default function Home() {
           </div>
         )}
       </main>
+          </div>
+        </div>
+      </div>
+      
+      {/* Footer */}
+      <footer className="flex flex-col items-center gap-4 py-8">
+        <Image 
+          src="/logo-white.svg" 
+          alt="Logo" 
+          width={48} 
+          height={48}
+          className="w-10 h-10 sm:w-12 sm:h-12 logo-spin"
+        />
+        <a 
+          href="https://www.mrdn.finance/" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="text-[#36D98D] hover:opacity-80 transition-opacity font-mono text-sm"
+        >
+          mrdn.finance
+        </a>
+      </footer>
     </div>
   );
 }
