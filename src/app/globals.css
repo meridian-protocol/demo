@@ -9,7 +9,8 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
+  --font-funnel-display: var(--font-funnel-display);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -23,4 +24,80 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+@keyframes gentleSpin {
+  0%, 90% {
+    transform: rotate(0deg);
+  }
+  95% {
+    transform: rotate(180deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+.logo-spin {
+  animation: gentleSpin 8s ease-in-out infinite;
+}
+
+/* Opening animation styles */
+.logo-opening {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 120px;
+  height: 120px;
+  z-index: 1000;
+  animation: openingSequence 2.2s ease-in-out forwards;
+}
+
+.logo-final {
+  width: 40px;
+  height: 40px;
+  transition: all 0.5s ease-in-out;
+}
+
+@media (min-width: 640px) {
+  .logo-opening {
+    width: 150px;
+    height: 150px;
+  }
+  
+  .logo-final {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+@keyframes openingSequence {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  40% {
+    transform: translate(-50%, -50%) rotate(360deg) scale(1.1);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-50%, -50%) rotate(360deg) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, calc(100vh - 80px)) rotate(360deg) scale(0.33);
+    opacity: 0;
+  }
+}
+
+.content-hidden {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.content-visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 0.6s ease-out 1.8s;
 }
