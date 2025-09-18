@@ -252,8 +252,6 @@ export default function Home() {
       <div className="flex-1 flex items-center justify-center">
         <div className="text-center flex flex-col items-center w-full max-w-4xl">
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-light mb-6 sm:mb-8 lg:mb-12 text-white px-4">
-            <span className="font-funnel-display font-light">Meridian</span>{" "}
-            x402 Demo
           </h1>
 
           <div className="bg-[#1F1F1F] rounded-xl shadow-lg p-6 sm:p-8 w-full max-w-2xl">
@@ -296,7 +294,16 @@ export default function Home() {
                       <h3 className="text-lg font-semibold mb-4 text-[#34D399] font-mono">
                         Sample Response:
                       </h3>
-                      <pre className="bg-black/50 p-4 rounded-lg border border-white/10 overflow-x-auto text-sm text-white/90 font-mono">
+                      <pre 
+                        className="bg-black/50 p-4 rounded-lg border border-white/10 text-xs sm:text-sm text-white/90 font-mono max-h-96"
+                        style={{
+                          overflow: 'auto',
+                          whiteSpace: 'pre-wrap',
+                          wordBreak: 'break-all',
+                          overflowWrap: 'anywhere',
+                          maxWidth: '100%'
+                        }}
+                      >
                         {JSON.stringify(sampleResponse, null, 2)}
                       </pre>
                     </div>
