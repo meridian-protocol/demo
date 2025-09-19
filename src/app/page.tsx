@@ -48,7 +48,7 @@ export default function Home() {
           <Github className="w-5 h-5 sm:w-6 sm:h-6 pointer-events-none" />
         </a>
         <a 
-          href="https://docs.mrdn.finance/" 
+          href="https://docs.mrdn.finance/development" 
           target="_blank" 
           rel="noopener noreferrer" 
           className="text-white/70 hover:text-white transition-colors cursor-pointer block p-1"
