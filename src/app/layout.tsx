@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Funnel_Display } from "next/font/google";
 import "./globals.css";
 import { WalletProvider } from "../components/wallet-provider";
+import { Footer } from "../components/footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -42,7 +43,10 @@ export default function RootLayout({
         <link rel="shortcut icon" href="/favicon.svg" />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} ${funnelDisplay.variable}`}>
-        <WalletProvider>{children}</WalletProvider>
+        <WalletProvider>
+          {children}
+          <Footer />
+        </WalletProvider>
       </body>
     </html>
   );

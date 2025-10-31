@@ -314,25 +314,6 @@ export default function Home() {
           </div>
         </div>
       </div>
-
-      {/* Footer */}
-      <footer className="flex flex-col items-center gap-4 py-8">
-        <Image
-          src="/logo-white.svg"
-          alt="Logo"
-          width={48}
-          height={48}
-          className="w-10 h-10 sm:w-12 sm:h-12 logo-spin"
-        />
-        <a
-          href="https://www.mrdn.finance/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-[#36D98D] hover:opacity-80 transition-opacity font-mono text-sm"
-        >
-          mrdn.finance
-        </a>
-      </footer>
     </div>
   );
 }

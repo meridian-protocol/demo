@@ -102,8 +102,7 @@ Timestamp: ${Date.now()}`;
       console.log("Payment payload:", paymentPayload);
 
       // Call the facilitator directly
-      const facilitatorUrl =
-        process.env.NEXT_PUBLIC_FACILITATOR_URL || "http://localhost:4021";
+  const facilitatorUrl = "https://api.mrdn.finance";
 
       const response = await fetch(`${facilitatorUrl}/v1/verify`, {
         method: "POST",
