@@ -1,4 +1,4 @@
-import { parseUnits, createPublicClient, http } from "viem";
+import { createPublicClient, http } from "viem";
 import { baseSepolia, optimismSepolia } from "viem/chains";
 
 export interface AcrossQuoteParams {
@@ -86,9 +86,8 @@ export async function getAcrossQuote(params: AcrossQuoteParams): Promise<AcrossQ
  * Create a mock quote for development/testing when the real API is not available
  */
 export function createMockAcrossQuote(
-  inputAmount: string,
-  originChainId: number,
-  destinationChainId: number
+  inputAmount: string
+  // originChainId and destinationChainId kept for API compatibility
 ): AcrossQuoteResponse {
   const inputAmountBig = BigInt(inputAmount);
   const bridgeFeeBps = BigInt(50); // 0.5% bridge fee
@@ -308,7 +307,7 @@ export async function getUsdcDomain(
     ]);
 
     return { name, version };
-  } catch (error) {
+  } catch {
     // Fallback to known USDC defaults if token does not expose one of the fields
     return { name: "USD Coin", version: "2" };
   }

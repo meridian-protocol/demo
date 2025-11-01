@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
     const inputAmount = searchParams.get('inputAmount');
     const originChainId = searchParams.get('originChainId');
     const destinationChainId = searchParams.get('destinationChainId');
-    const tradeType = searchParams.get('tradeType') || 'exactInput';
+    // tradeType is always exactInput per spec
     const recipient = searchParams.get('recipient');
 
     // Build the Across API URL

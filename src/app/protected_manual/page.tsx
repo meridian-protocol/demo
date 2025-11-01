@@ -5,7 +5,6 @@ import { useState } from "react";
 import axios from "axios";
 import { createPaymentHeader, selectPaymentRequirements } from "x402/client";
 import { ChainIdToNetwork, PaymentRequirementsSchema } from "x402/types";
-import Image from "next/image";
 import Link from "next/link";
 import { Github, Book, Twitter, Telegram } from "iconoir-react";
 

@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-
 export function Footer() {
   return (
     <footer className="w-full bg-black">
@@ -107,6 +105,7 @@ export function Footer() {
         {/* Bottom Copyright */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 pt-8 border-t border-gray-800">
           <div className="flex items-center gap-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/logo-white.svg" alt="Meridian" className="h-10 w-10" />
           </div>
           <p className="text-gray-500 text-sm">© Meridian 2025</p>
