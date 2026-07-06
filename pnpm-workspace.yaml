@@ -1,0 +1,6 @@
+allowBuilds:
+  '@tailwindcss/oxide': true
+  bufferutil: false
+  sharp: true
+  unrs-resolver: true
+  utf-8-validate: false

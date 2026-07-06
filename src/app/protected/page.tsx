@@ -1,52 +1,436 @@
+"use client";
+
+import { useCallback, useEffect, useState } from "react";
+import {
+  bytesToHex,
+  createWalletClient,
+  custom,
+  defineChain,
+  formatUnits,
+  type WalletClient,
+} from "viem";
+import { NETWORK, type PaymentRequirements } from "@/lib/protected-demo";
+
+type Eip1193Provider = {
+  request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
+  on?: (event: string, callback: (...args: unknown[]) => void) => void;
+  removeListener?: (
+    event: string,
+    callback: (...args: unknown[]) => void,
+  ) => void;
+};
+
+type ChallengeResponse = {
+  x402Version: number;
+  error?: string;
+  accepts: PaymentRequirements[];
+};
+
+type PaidResponse = {
+  success: boolean;
+  message?: string;
+  error?: string;
+  content?: Record<string, unknown>;
+  settlement?: Record<string, unknown>;
+};
+
+const baseSepolia = defineChain({
+  id: NETWORK.chainId,
+  name: NETWORK.name,
+  nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
+  rpcUrls: {
+    default: { http: [...NETWORK.rpcUrls] },
+    public: { http: [...NETWORK.rpcUrls] },
+  },
+  blockExplorers: {
+    default: { name: "Basescan", url: NETWORK.explorerUrl },
+  },
+});
+
+function getEthereum(): Eip1193Provider | undefined {
+  if (typeof window === "undefined") {
+    return undefined;
+  }
+
+  return (window as Window & { ethereum?: Eip1193Provider }).ethereum;
+}
+
 export default function ProtectedPage() {
+  const [account, setAccount] = useState<`0x${string}` | null>(null);
+  const [chainId, setChainId] = useState<number | null>(null);
+  const [client, setClient] = useState<WalletClient | null>(null);
+  const [challenge, setChallenge] = useState<ChallengeResponse | null>(null);
+  const [result, setResult] = useState<PaidResponse | null>(null);
+  const [status, setStatus] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const requirement = challenge?.accepts.find(
+    (entry) => entry.network === NETWORK.id,
+  );
+
+  const refreshWalletState = useCallback(async () => {
+    const ethereum = getEthereum();
+    if (!ethereum) {
+      setError("No EVM wallet provider found.");
+      return;
+    }
+
+    const accounts = (await ethereum.request({
+      method: "eth_accounts",
+    })) as string[];
+
+    if (accounts.length === 0) {
+      setAccount(null);
+      setClient(null);
+      setChainId(null);
+      return;
+    }
+
+    const chainIdHex = (await ethereum.request({
+      method: "eth_chainId",
+    })) as string;
+    const nextChainId = Number.parseInt(chainIdHex, 16);
+    const nextAccount = accounts[0] as `0x${string}`;
+
+    setAccount(nextAccount);
+    setChainId(nextChainId);
+    setClient(
+      createWalletClient({
+        account: nextAccount,
+        chain: baseSepolia,
+        transport: custom(ethereum),
+      }),
+    );
+  }, []);
+
+  useEffect(() => {
+    // Preview the seller challenge on load; the pay flow re-fetches it.
+    fetch("/api/protected", { cache: "no-store" })
+      .then((response) => response.json())
+      .then((body: ChallengeResponse) => setChallenge(body))
+      .catch(() => setError("Failed to load payment requirements."));
+    void refreshWalletState();
+  }, [refreshWalletState]);
+
+  useEffect(() => {
+    const ethereum = getEthereum();
+    if (!ethereum?.on) {
+      return;
+    }
+
+    const handleChange = () => {
+      void refreshWalletState();
+    };
+
+    ethereum.on("accountsChanged", handleChange);
+    ethereum.on("chainChanged", handleChange);
+
+    return () => {
+      ethereum.removeListener?.("accountsChanged", handleChange);
+      ethereum.removeListener?.("chainChanged", handleChange);
+    };
+  }, [refreshWalletState]);
+
+  const connectWallet = async () => {
+    const ethereum = getEthereum();
+    if (!ethereum) {
+      setError("No EVM wallet provider found.");
+      return;
+    }
+
+    setError("");
+    await ethereum.request({ method: "eth_requestAccounts" });
+    await refreshWalletState();
+  };
+
+  const switchToBaseSepolia = async () => {
+    const ethereum = getEthereum();
+    if (!ethereum) {
+      setError("No EVM wallet provider found.");
+      return;
+    }
+
+    const chainIdHex = `0x${NETWORK.chainId.toString(16)}`;
+
+    try {
+      await ethereum.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: chainIdHex }],
+      });
+    } catch (switchError) {
+      const code =
+        typeof switchError === "object" &&
+        switchError !== null &&
+        "code" in switchError
+          ? (switchError as { code?: number }).code
+          : undefined;
+
+      if (code !== 4902) {
+        throw switchError;
+      }
+
+      await ethereum.request({
+        method: "wallet_addEthereumChain",
+        params: [
+          {
+            chainId: chainIdHex,
+            chainName: NETWORK.name,
+            nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
+            rpcUrls: [...NETWORK.rpcUrls],
+            blockExplorerUrls: [NETWORK.explorerUrl],
+          },
+        ],
+      });
+    }
+
+    await refreshWalletState();
+  };
+
+  // Sign the EIP-3009 TransferWithAuthorization as typed data and resubmit
+  // the request with the signed payload — the flow from the Quickstart docs.
+  const payAndRetry = async (
+    selected: PaymentRequirements,
+    walletClient: WalletClient,
+    buyer: `0x${string}`,
+  ): Promise<PaidResponse> => {
+    const now = BigInt(Math.floor(Date.now() / 1000));
+    const authorization = {
+      from: buyer,
+      to: selected.payTo as `0x${string}`,
+      value: BigInt(selected.maxAmountRequired),
+      validAfter: BigInt(0),
+      validBefore: now + BigInt(selected.maxTimeoutSeconds),
+      nonce: bytesToHex(crypto.getRandomValues(new Uint8Array(32))),
+    };
+
+    const signature = await walletClient.signTypedData({
+      account: buyer,
+      domain: {
+        name: selected.extra?.name ?? "USD Coin",
+        version: selected.extra?.version ?? "2",
+        chainId: NETWORK.chainId,
+        verifyingContract: selected.asset as `0x${string}`,
+      },
+      types: {
+        TransferWithAuthorization: [
+          { name: "from", type: "address" },
+          { name: "to", type: "address" },
+          { name: "value", type: "uint256" },
+          { name: "validAfter", type: "uint256" },
+          { name: "validBefore", type: "uint256" },
+          { name: "nonce", type: "bytes32" },
+        ],
+      },
+      primaryType: "TransferWithAuthorization",
+      message: authorization,
+    });
+
+    const paymentPayload = {
+      x402Version: 1,
+      scheme: "exact",
+      network: selected.network,
+      payload: {
+        signature,
+        authorization: {
+          from: authorization.from,
+          to: authorization.to,
+          value: authorization.value.toString(),
+          validAfter: authorization.validAfter.toString(),
+          validBefore: authorization.validBefore.toString(),
+          nonce: authorization.nonce,
+        },
+      },
+    };
+
+    const response = await fetch("/api/protected", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ paymentPayload }),
+    });
+
+    const body = (await response.json()) as PaidResponse & {
+      error?: string;
+    };
+
+    if (!response.ok || !body.success) {
+      throw new Error(body.error ?? "Payment was rejected");
+    }
+
+    return body;
+  };
+
+  const requestResource = async () => {
+    setError("");
+    setResult(null);
+
+    if (!client || !account) {
+      await connectWallet();
+      return;
+    }
+
+    if (chainId !== NETWORK.chainId) {
+      setError(`Switch your wallet to ${NETWORK.name} first.`);
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      setStatus("Requesting protected resource");
+      const response = await fetch("/api/protected", { cache: "no-store" });
+
+      if (response.status !== 402) {
+        throw new Error(`Expected a 402 challenge, got ${response.status}`);
+      }
+
+      const latestChallenge = (await response.json()) as ChallengeResponse;
+      setChallenge(latestChallenge);
+
+      const selected = latestChallenge.accepts.find(
+        (entry) => entry.network === NETWORK.id,
+      );
+      if (!selected) {
+        throw new Error(`No ${NETWORK.name} payment requirement in accepts`);
+      }
+
+      setStatus("Signing EIP-3009 authorization");
+      const paid = await payAndRetry(selected, client, account);
+
+      setResult(paid);
+      setStatus("Payment settled");
+    } catch (payError) {
+      setError(
+        payError instanceof Error ? payError.message : "Payment failed.",
+      );
+      setStatus("");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const onCorrectChain = chainId === NETWORK.chainId;
+
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="max-w-2xl mx-auto p-8">
-        <h1 className="text-4xl font-bold mb-4">Protected Content</h1>
-        <p className="text-lg">
-          Your payment was successful! Enjoy this banger song.
-        </p>
-        <iframe
-          width="100%"
-          height="300"
-          scrolling="no"
-          frameBorder="no"
-          allow="autoplay"
-          src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/2044190296&color=%23ff5500&auto_play=true&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"
-        ></iframe>
-        <div
-          style={{
-            fontSize: "10px",
-            color: "#cccccc",
-            lineBreak: "anywhere",
-            wordBreak: "normal",
-            overflow: "hidden",
-            whiteSpace: "nowrap",
-            textOverflow: "ellipsis",
-            fontFamily:
-              "Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif",
-            fontWeight: "100",
-          }}
-        >
-          <a
-            href="https://soundcloud.com/dan-kim-675678711"
-            title="danXkim"
-            target="_blank"
-            style={{ color: "#cccccc", textDecoration: "none" }}
-          >
-            danXkim
-          </a>{" "}
-          ·{" "}
-          <a
-            href="https://soundcloud.com/dan-kim-675678711/x402"
-            title="x402 (DJ Reppel Remix)"
-            target="_blank"
-            style={{ color: "#cccccc", textDecoration: "none" }}
-          >
-            x402 (DJ Reppel Remix)
-          </a>
-        </div>
+    <main className="min-h-screen bg-[#0f1115] px-6 py-10 text-white">
+      <div className="mx-auto flex max-w-3xl flex-col gap-8">
+        <header className="flex flex-col gap-3">
+          <p className="text-sm font-medium uppercase tracking-[0.18em] text-emerald-300">
+            Meridian developer demo
+          </p>
+          <h1 className="text-3xl font-semibold tracking-normal md:text-5xl">
+            Same-chain x402 payment
+          </h1>
+          <p className="max-w-2xl text-sm leading-6 text-slate-300 md:text-base">
+            The seller endpoint returns a 402 challenge for {NETWORK.name}. The
+            browser signs one EIP-3009 authorization with viem and resubmits
+            the request; the server settles it through Meridian. No transaction
+            is submitted by the buyer and no gas is paid.
+          </p>
+        </header>
+
+        <section className="rounded-lg border border-white/10 bg-white/[0.04] p-5">
+          <h2 className="text-lg font-medium">Wallet</h2>
+          <div className="mt-4 space-y-2 text-sm text-slate-300">
+            <p>
+              Account:{" "}
+              <span className="font-mono text-white">
+                {account
+                  ? `${account.slice(0, 6)}...${account.slice(-4)}`
+                  : "Not connected"}
+              </span>
+            </p>
+            <p>
+              Network:{" "}
+              <span className="text-white">
+                {chainId === null
+                  ? "No network detected"
+                  : onCorrectChain
+                    ? NETWORK.name
+                    : `Chain ${chainId} (switch to ${NETWORK.name})`}
+              </span>
+            </p>
+          </div>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={connectWallet}
+              className="rounded-md bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-emerald-300"
+            >
+              {account ? "Refresh wallet" : "Connect wallet"}
+            </button>
+            {account && !onCorrectChain ? (
+              <button
+                type="button"
+                onClick={switchToBaseSepolia}
+                className="rounded-md bg-white px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-slate-200"
+              >
+                Switch to {NETWORK.name}
+              </button>
+            ) : null}
+            <button
+              type="button"
+              onClick={requestResource}
+              disabled={isLoading || !account || !onCorrectChain}
+              className="rounded-md bg-white px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-slate-200 disabled:cursor-not-allowed disabled:bg-slate-600 disabled:text-slate-300"
+            >
+              {isLoading ? "Processing" : "Request protected resource"}
+            </button>
+          </div>
+        </section>
+
+        <section className="rounded-lg border border-white/10 bg-white/[0.04] p-5">
+          <h2 className="text-lg font-medium">Seller `accepts`</h2>
+          {requirement ? (
+            <div className="mt-4 space-y-2 text-sm text-slate-300">
+              <p>
+                Price:{" "}
+                <span className="text-white">
+                  {formatUnits(BigInt(requirement.maxAmountRequired), 6)} USDC
+                </span>
+              </p>
+              <p>
+                Asset:{" "}
+                <span className="font-mono text-xs text-white">
+                  {requirement.asset}
+                </span>
+              </p>
+              <p>
+                Pay to (facilitator):{" "}
+                <span className="font-mono text-xs text-white">
+                  {requirement.payTo}
+                </span>
+              </p>
+              <p>
+                Network: <span className="text-white">{requirement.network}</span>
+              </p>
+            </div>
+          ) : (
+            <p className="mt-4 text-sm text-slate-300">Loading challenge…</p>
+          )}
+          <p className="mt-4 text-xs leading-5 text-slate-400">
+            Test USDC on {NETWORK.name} is available from Circle&apos;s faucet
+            (faucet.circle.com). `payTo` targets the Meridian facilitator, not
+            the merchant wallet — the payout recipient is configured in
+            organization settings.
+          </p>
+        </section>
+
+        {(status || error || result) && (
+          <section className="rounded-lg border border-white/10 bg-slate-950 p-5">
+            <h2 className="text-lg font-medium">Result</h2>
+            {status ? (
+              <p className="mt-3 text-sm text-emerald-300">{status}</p>
+            ) : null}
+            {error ? <p className="mt-3 text-sm text-red-300">{error}</p> : null}
+            {result ? (
+              <pre className="mt-4 max-h-80 overflow-auto rounded-md bg-black p-4 text-xs text-slate-200">
+                {JSON.stringify(result, null, 2)}
+              </pre>
+            ) : null}
+          </section>
+        )}
       </div>
-    </div>
+    </main>
   );
 }
