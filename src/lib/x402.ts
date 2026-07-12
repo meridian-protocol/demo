@@ -28,6 +28,10 @@ export interface PaymentRequirements {
     destinationChainId?: number;
     // Optional marketplace/platform payout override.
     creditedRecipient?: string;
+    // Solana requirements additionally carry the facilitator's on-chain
+    // settlement config (feePayer, programId, configPda, usdcMint, ...);
+    // see src/lib/solana-x402.ts.
+    [key: string]: unknown;
   };
 }
 

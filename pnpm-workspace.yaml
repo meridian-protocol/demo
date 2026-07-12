@@ -1,5 +1,6 @@
 allowBuilds:
   '@tailwindcss/oxide': true
+  bigint-buffer: false
   bufferutil: false
   sharp: true
   unrs-resolver: true

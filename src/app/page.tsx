@@ -11,9 +11,9 @@ export default function Home() {
         <p className="mb-8 max-w-2xl text-sm leading-6 text-slate-300 md:text-base">
           Start with a manual same-chain x402 flow, then inspect the cross-chain
           flow where the seller returns several source-chain payment
-          requirements.
+          requirements, or pay with USDC on Solana.
         </p>
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-3">
           <Link
             href="/cross-chain"
             className="rounded-lg border border-emerald-300/30 bg-emerald-300 px-5 py-4 text-sm font-semibold text-slate-950 transition-colors hover:bg-emerald-200"
@@ -25,6 +25,12 @@ export default function Home() {
             className="rounded-lg border border-white/10 bg-white/[0.04] px-5 py-4 text-sm font-semibold text-white transition-colors hover:border-white/30"
           >
             Manual same-chain x402
+          </Link>
+          <Link
+            href="/protected_solana"
+            className="rounded-lg border border-purple-300/30 bg-white/[0.04] px-5 py-4 text-sm font-semibold text-purple-200 transition-colors hover:border-purple-300/60"
+          >
+            Solana x402
           </Link>
         </div>
       </div>
