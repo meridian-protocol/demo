@@ -284,14 +284,14 @@ export default function ProtectedSolanaPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-950 to-black px-4 py-8 text-white">
-      <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-3xl flex-col justify-center gap-6">
+    <main className="min-h-[calc(100vh-3.5rem)] px-4 py-8 text-[var(--foreground)] xl:min-h-[calc(100vh-4rem)]">
+      <div className="mx-auto flex min-h-[calc(100vh-8rem)] w-full max-w-3xl flex-col justify-center gap-6">
         <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="mb-2 font-mono text-sm uppercase tracking-[0.2em] text-purple-300">
-              Meridian x402
+            <p className="mb-2 font-funnel-display text-sm font-medium uppercase tracking-[0.18em] text-[var(--accent)]">
+              Developer demo
             </p>
-            <h1 className="text-4xl font-bold tracking-normal">
+            <h1 className="font-funnel-display text-4xl font-semibold tracking-tight">
               Solana Protected Route
             </h1>
           </div>
@@ -300,7 +300,7 @@ export default function ProtectedSolanaPage() {
           </div>
         </header>
 
-        <section className="rounded-lg border border-white/10 bg-white/[0.04] p-5 shadow-2xl shadow-black/20">
+        <section className="rounded-2xl bg-[var(--card-bg)] p-5 shadow-[0_4px_20px_var(--pay-hero-shadow)]">
           <div className="mb-5 grid gap-2 sm:grid-cols-5">
             {steps.map((item, index) => {
               const reached = activeStepIndex >= index;
@@ -308,11 +308,11 @@ export default function ProtectedSolanaPage() {
               return (
                 <div
                   key={item.key}
-                  className={`rounded-md border px-3 py-2 text-center text-xs font-semibold transition ${
+                  className={`rounded-xl px-3 py-2 text-center text-xs font-semibold transition ${
                     reached
-                      ? "border-purple-400/70 bg-purple-500/20 text-purple-100"
-                      : "border-white/10 bg-black/20 text-gray-500"
-                  } ${current ? "ring-2 ring-purple-300/40" : ""}`}
+                      ? "bg-[var(--accent)] text-[var(--accent-foreground)]"
+                      : "bg-[var(--pay-chip-bg)] text-[var(--text-muted)]"
+                  } ${current ? "ring-2 ring-[var(--accent)]/40" : ""}`}
                 >
                   {item.label}
                 </div>
@@ -325,19 +325,19 @@ export default function ProtectedSolanaPage() {
               type="button"
               onClick={requestProtectedContent}
               disabled={isBusy}
-              className="w-full rounded-md bg-purple-600 px-5 py-3 font-mono text-base font-semibold text-white transition hover:bg-purple-500 disabled:cursor-not-allowed disabled:bg-purple-900/50 disabled:text-purple-200/50"
+              className="w-full rounded-xl bg-[var(--accent)] px-5 py-3 text-base font-semibold text-[var(--accent-foreground)] transition hover:bg-[var(--accent-hover)] disabled:cursor-not-allowed disabled:bg-[var(--pay-primary-disabled-bg)] disabled:text-[var(--text-muted)]"
             >
               {isBusy ? "Processing..." : "Request Protected Content"}
             </button>
 
             {wallet.publicKey && (
-              <div className="rounded-md border border-emerald-400/20 bg-emerald-400/10 px-3 py-2 text-sm text-emerald-200">
+              <div className="rounded-xl bg-[var(--pay-badge-completed-bg)] px-3 py-2 text-sm text-[var(--pay-badge-completed-text)]">
                 Wallet connected: {shortAddress(wallet.publicKey.toBase58())}
               </div>
             )}
 
             {error && (
-              <div className="rounded-md border border-red-400/25 bg-red-500/10 px-3 py-2 text-sm text-red-200">
+              <div className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700">
                 {error}
               </div>
             )}
@@ -345,35 +345,35 @@ export default function ProtectedSolanaPage() {
         </section>
 
         {challenge?.accepts?.[0] && (
-          <section className="rounded-lg border border-purple-300/20 bg-purple-500/10 p-5">
+          <section className="rounded-2xl bg-[var(--card-bg)] p-5">
             <div className="mb-3 flex items-center justify-between gap-3">
-              <h2 className="text-lg font-semibold">402 Requirements</h2>
-              <span className="rounded-md bg-black/30 px-2 py-1 font-mono text-xs text-purple-100">
+              <h2 className="font-funnel-display text-lg font-semibold">402 Requirements</h2>
+              <span className="rounded-xl bg-[var(--pay-chip-bg)] px-2 py-1 font-mono text-xs text-[var(--text-secondary)]">
                 {challenge.accepts[0].network}
               </span>
             </div>
             <dl className="grid gap-3 text-sm sm:grid-cols-2">
               <div>
-                <dt className="text-gray-400">Amount</dt>
-                <dd className="font-mono text-white">
+                <dt className="text-[var(--text-muted)]">Amount</dt>
+                <dd className="font-mono text-[var(--foreground)]">
                   {challenge.accepts[0].maxAmountRequired} USDC base units
                 </dd>
               </div>
               <div>
-                <dt className="text-gray-400">Asset</dt>
-                <dd className="break-all font-mono text-white">
+                <dt className="text-[var(--text-muted)]">Asset</dt>
+                <dd className="break-all font-mono text-[var(--foreground)]">
                   {challenge.accepts[0].asset}
                 </dd>
               </div>
               <div>
-                <dt className="text-gray-400">Recipient</dt>
-                <dd className="break-all font-mono text-white">
+                <dt className="text-[var(--text-muted)]">Recipient</dt>
+                <dd className="break-all font-mono text-[var(--foreground)]">
                   {challenge.accepts[0].payTo}
                 </dd>
               </div>
               <div>
-                <dt className="text-gray-400">Fee payer</dt>
-                <dd className="break-all font-mono text-white">
+                <dt className="text-[var(--text-muted)]">Fee payer</dt>
+                <dd className="break-all font-mono text-[var(--foreground)]">
                   {String(challenge.accepts[0].extra?.feePayer ?? "")}
                 </dd>
               </div>
@@ -382,24 +382,26 @@ export default function ProtectedSolanaPage() {
         )}
 
         {content && (
-          <section className="rounded-lg border border-emerald-400/20 bg-emerald-500/10 p-5">
-            <h2 className="mb-2 text-2xl font-bold text-emerald-100">
+          <section className="rounded-2xl bg-[var(--pay-badge-completed-bg)] p-5">
+            <h2 className="mb-2 font-funnel-display text-2xl font-bold text-[var(--pay-receipt-title)]">
               {content.message ?? "Unlocked"}
             </h2>
             {content.content && (
-              <p className="mb-4 text-emerald-50">{content.content}</p>
+              <p className="mb-4 text-[var(--pay-badge-completed-text)]">
+                {content.content}
+              </p>
             )}
             {signature && (
               <a
                 href={explorerTxUrl(signature)}
                 target="_blank"
                 rel="noreferrer"
-                className="mb-4 block break-all font-mono text-sm text-emerald-200 underline underline-offset-4"
+                className="mb-4 block break-all font-mono text-sm text-[var(--pay-receipt-title)] underline underline-offset-4"
               >
                 View settlement {signature}
               </a>
             )}
-            <pre className="max-h-72 overflow-auto rounded-md bg-black/35 p-3 text-xs text-gray-200">
+            <pre className="max-h-72 overflow-auto rounded-xl bg-[var(--input-bg)] p-3 text-xs text-[var(--foreground)]">
               {JSON.stringify(content, null, 2)}
             </pre>
           </section>

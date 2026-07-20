@@ -336,16 +336,16 @@ export default function CrossChainPage() {
     : undefined;
 
   return (
-    <main className="min-h-screen bg-[#0f1115] px-6 py-10 text-white">
+    <main className="min-h-[calc(100vh-3.5rem)] px-6 py-10 text-[var(--foreground)] xl:min-h-[calc(100vh-4rem)]">
       <div className="mx-auto flex max-w-5xl flex-col gap-8">
         <header className="flex flex-col gap-3">
-          <p className="text-sm font-medium uppercase tracking-[0.18em] text-emerald-300">
-            Meridian developer demo
+          <p className="font-funnel-display text-sm font-medium uppercase tracking-[0.18em] text-[var(--accent)]">
+            Developer demo
           </p>
-          <h1 className="text-3xl font-semibold tracking-normal md:text-5xl">
+          <h1 className="font-funnel-display text-3xl font-semibold tracking-tight md:text-5xl">
             Cross-chain x402 payments
           </h1>
-          <p className="max-w-3xl text-sm leading-6 text-slate-300 md:text-base">
+          <p className="max-w-3xl text-sm leading-6 text-[var(--text-secondary)] md:text-base">
             The seller endpoint returns several source-chain payment
             requirements. The browser selects the route for the connected
             wallet chain and signs one EIP-3009 authorization.
@@ -353,24 +353,24 @@ export default function CrossChainPage() {
         </header>
 
         <section className="grid gap-4 md:grid-cols-[1fr_1fr]">
-          <div className="rounded-lg border border-white/10 bg-white/[0.04] p-5">
-            <h2 className="text-lg font-medium">Wallet</h2>
-            <div className="mt-4 space-y-2 text-sm text-slate-300">
+          <div className="rounded-2xl bg-[var(--card-bg)] p-5">
+            <h2 className="font-funnel-display text-lg font-medium">Wallet</h2>
+            <div className="mt-4 space-y-2 text-sm text-[var(--text-secondary)]">
               <p>
                 Account:{" "}
-                <span className="font-mono text-white">
+                <span className="font-mono text-[var(--foreground)]">
                   {account ? `${account.slice(0, 6)}...${account.slice(-4)}` : "Not connected"}
                 </span>
               </p>
               <p>
                 Network:{" "}
-                <span className="text-white">
+                <span className="text-[var(--foreground)]">
                   {chain?.name ?? "No network detected"}
                 </span>
               </p>
               <p>
                 Selected route:{" "}
-                <span className="text-white">
+                <span className="text-[var(--foreground)]">
                   {selectedPaymentRequirements
                     ? getPaymentRouteLabel(selectedPaymentRequirements)
                     : connectedDemoNetwork
@@ -383,7 +383,7 @@ export default function CrossChainPage() {
               <button
                 type="button"
                 onClick={connectWallet}
-                className="rounded-md bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-emerald-300"
+                className="rounded-xl bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--accent-foreground)] hover:bg-[var(--accent-hover)]"
               >
                 {account ? "Refresh wallet" : "Connect wallet"}
               </button>
@@ -391,15 +391,15 @@ export default function CrossChainPage() {
                 type="button"
                 onClick={pay}
                 disabled={isLoading || !selectedPaymentRequirements}
-                className="rounded-md bg-white px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-slate-200 disabled:cursor-not-allowed disabled:bg-slate-600 disabled:text-slate-300"
+                className="rounded-xl bg-[var(--input-bg)] px-4 py-2 text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--pay-section-bg)] disabled:cursor-not-allowed disabled:bg-[var(--pay-primary-disabled-bg)] disabled:text-[var(--text-muted)]"
               >
                 {isLoading ? "Processing" : "Pay selected route"}
               </button>
             </div>
           </div>
 
-          <div className="rounded-lg border border-white/10 bg-white/[0.04] p-5">
-            <h2 className="text-lg font-medium">Source Chains</h2>
+          <div className="rounded-2xl bg-[var(--card-bg)] p-5">
+            <h2 className="font-funnel-display text-lg font-medium">Source Chains</h2>
             <div className="mt-4 flex flex-wrap gap-3">
               {CROSS_CHAIN_DEMO_SOURCE_NETWORKS.map((network) => {
                 const source = CROSS_CHAIN_DEMO_NETWORKS[network];
@@ -410,10 +410,10 @@ export default function CrossChainPage() {
                     key={network}
                     type="button"
                     onClick={() => switchToSource(network)}
-                    className={`rounded-md border px-3 py-2 text-sm ${
+                    className={`rounded-xl px-3 py-2 text-sm ${
                       isConnected
-                        ? "border-emerald-300 bg-emerald-300 text-slate-950"
-                        : "border-white/10 bg-slate-900 text-slate-200 hover:border-white/30"
+                        ? "bg-[var(--accent)] text-[var(--accent-foreground)]"
+                        : "bg-[var(--input-bg)] text-[var(--foreground)] hover:bg-[var(--pay-section-bg)]"
                     }`}
                   >
                     {source.name}
@@ -421,38 +421,38 @@ export default function CrossChainPage() {
                 );
               })}
             </div>
-            <p className="mt-4 text-sm leading-6 text-slate-300">
+            <p className="mt-4 text-sm leading-6 text-[var(--text-secondary)]">
               Destination chain: Base ({CROSS_CHAIN_DESTINATION_CHAIN_ID}).
               Cross-chain routes use Across exact-input settlement.
             </p>
           </div>
         </section>
 
-        <section className="rounded-lg border border-white/10 bg-white/[0.04] p-5">
+        <section className="rounded-2xl bg-[var(--card-bg)] p-5">
           <div className="flex items-center justify-between gap-4">
-            <h2 className="text-lg font-medium">Seller `accepts`</h2>
+            <h2 className="font-funnel-display text-lg font-medium">Seller `accepts`</h2>
             <button
               type="button"
               onClick={() => loadChallenge()}
-              className="rounded-md border border-white/10 px-3 py-2 text-sm text-slate-200 hover:border-white/30"
+              className="rounded-xl bg-[var(--input-bg)] px-3 py-2 text-sm text-[var(--foreground)] hover:bg-[var(--pay-section-bg)]"
             >
               Refresh
             </button>
           </div>
           <div className="mt-4 overflow-x-auto">
             <table className="w-full min-w-[720px] text-left text-sm">
-              <thead className="text-slate-400">
+              <thead className="text-[var(--text-muted)]">
                 <tr>
-                  <th className="border-b border-white/10 py-2 pr-4 font-medium">
+                  <th className="py-2 pr-4 font-medium">
                     Source
                   </th>
-                  <th className="border-b border-white/10 py-2 pr-4 font-medium">
+                  <th className="py-2 pr-4 font-medium">
                     Amount
                   </th>
-                  <th className="border-b border-white/10 py-2 pr-4 font-medium">
+                  <th className="py-2 pr-4 font-medium">
                     Asset
                   </th>
-                  <th className="border-b border-white/10 py-2 pr-4 font-medium">
+                  <th className="py-2 pr-4 font-medium">
                     Destination
                   </th>
                 </tr>
@@ -460,16 +460,16 @@ export default function CrossChainPage() {
               <tbody>
                 {(challenge?.accepts ?? []).map((requirement) => (
                   <tr key={requirement.network}>
-                    <td className="border-b border-white/10 py-3 pr-4">
+                    <td className="py-3 pr-4">
                       {getPaymentRouteLabel(requirement)}
                     </td>
-                    <td className="border-b border-white/10 py-3 pr-4">
+                    <td className="py-3 pr-4">
                       {usdcAmount(requirement.maxAmountRequired)} USDC
                     </td>
-                    <td className="border-b border-white/10 py-3 pr-4 font-mono text-xs text-slate-300">
+                    <td className="py-3 pr-4 font-mono text-xs text-[var(--text-secondary)]">
                       {requirement.asset}
                     </td>
-                    <td className="border-b border-white/10 py-3 pr-4">
+                    <td className="py-3 pr-4">
                       Base ({String(requirement.extra?.destinationChainId)})
                     </td>
                   </tr>
@@ -480,12 +480,12 @@ export default function CrossChainPage() {
         </section>
 
         {(status || error || result) && (
-          <section className="rounded-lg border border-white/10 bg-slate-950 p-5">
-            <h2 className="text-lg font-medium">Result</h2>
-            {status ? <p className="mt-3 text-sm text-emerald-300">{status}</p> : null}
-            {error ? <p className="mt-3 text-sm text-red-300">{error}</p> : null}
+          <section className="rounded-2xl bg-[var(--pay-section-bg)] p-5">
+            <h2 className="font-funnel-display text-lg font-medium">Result</h2>
+            {status ? <p className="mt-3 text-sm text-[var(--pay-receipt-title)]">{status}</p> : null}
+            {error ? <p className="mt-3 text-sm text-red-600">{error}</p> : null}
             {result ? (
-              <pre className="mt-4 max-h-80 overflow-auto rounded-md bg-black p-4 text-xs text-slate-200">
+              <pre className="mt-4 max-h-80 overflow-auto rounded-xl bg-[var(--input-bg)] p-4 text-xs text-[var(--foreground)]">
                 {JSON.stringify(result, null, 2)}
               </pre>
             ) : null}

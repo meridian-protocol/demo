@@ -1,26 +1,61 @@
 @import "tailwindcss";
 
+/* Light theme — matches /pay EVM light mode */
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #171719;
+  --card-bg: #f5f5f5;
+  --pay-section-bg: #ececec;
+  --input-bg: #ffffff;
+  --pay-popover-bg: #ffffff;
+  --pay-chip-bg: #f0f0f0;
+  --text-secondary: #717171;
+  --text-muted: #8c8c8c;
+  --pay-title: #171719;
+  --pay-hero-shadow: rgba(0, 0, 0, 0.08);
+  --pay-dropdown-shadow: 0 8px 30px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.06);
+  --accent: #34d399;
+  --accent-hover: #2db882;
+  --accent-foreground: #0f0f11;
+  --pay-muted-btn: rgba(113, 113, 113, 0.15);
+  --pay-muted-btn-text: #717171;
+  --pay-primary-disabled-bg: #ffffff;
+  --pay-primary-disabled-border: #ececec;
+  --pay-badge-completed-bg: rgba(52, 211, 153, 0.28);
+  --pay-badge-completed-text: #047857;
+  --pay-receipt-title: #047857;
+  --border-color: #ececec;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
+  --font-funnel-display: var(--font-funnel-display);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+/* Solana wallet adapter — light modal to match theme */
+.wallet-adapter-modal {
+  background: rgba(0, 0, 0, 0.4) !important;
+}
+.wallet-adapter-modal-wrapper {
+  background: #ffffff !important;
+  color: #171719 !important;
+}
+.wallet-adapter-modal-title {
+  color: #171719 !important;
+}
+.wallet-adapter-modal-list .wallet-adapter-button {
+  background-color: #f5f5f5 !important;
+  color: #171719 !important;
+}
+.wallet-adapter-modal-list .wallet-adapter-button:hover {
+  background-color: #ececec !important;
 }
